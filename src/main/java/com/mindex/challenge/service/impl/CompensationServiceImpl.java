@@ -33,8 +33,13 @@ public class CompensationServiceImpl implements CompensationService {
     public Compensation create(Employee employee) {
         LOG.debug("Creating compensation [{}]", employee);
 
+        if (employee == null) {
+            throw new RuntimeException("Invalid Employee.");
+        }
+        String employeeId = employee.getEmployeeId();
         Compensation compensation = new Compensation();
-        compensation.setEmployeeId(employee.getEmployeeId());
+        compensation.setEmployeeId(employeeId);
+        compensation.setEmployee(employeeRepository.findByEmployeeId(employeeId));
         compensationRepository.insert(compensation);
 
         return compensation;
