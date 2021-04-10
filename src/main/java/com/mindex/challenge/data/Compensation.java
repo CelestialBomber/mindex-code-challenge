@@ -7,6 +7,11 @@ public class Compensation
     private int salary;
     private String effectiveDate;
 
+    /**
+     * I know it said to have the fields "employee," "salary," and "effectiveDate,"
+     * but I figured direct access to employeeId would be preferable, while only storing
+     * Employee after getting the Compensation object.
+     */
     public Compensation() { }
 
     // Getters

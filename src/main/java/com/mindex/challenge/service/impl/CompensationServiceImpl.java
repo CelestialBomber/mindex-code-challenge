@@ -23,6 +23,12 @@ public class CompensationServiceImpl implements CompensationService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
+    /**
+     * You need an Employee in order to create a Compensation, there's no making up a random UUID for this one.
+     * SIDE-EFFECT : Compensation is added to the repository.
+     * @param employee - Employee to create a base Compensation out of.
+     * @return Newly created Compensation.
+     */
     @Override
     public Compensation create(Employee employee) {
         LOG.debug("Creating compensation [{}]", employee);
@@ -34,11 +40,21 @@ public class CompensationServiceImpl implements CompensationService {
         return compensation;
     }
 
+    /**
+     * It's a GET endpoint - Compensation must already exist.
+     * @param id - EmployeeId to find a compensation.
+     * @return - Found compensation with updated Employee data.
+     */
     @Override
     public Compensation read(String id) {
-        LOG.debug("Creating compensation with id [{}]", id);
+        LOG.debug("Getting compensation with id [{}]", id);
 
         Compensation compensation = compensationRepository.findByEmployeeId(id);
+
+        if (compensation == null) {
+            throw new RuntimeException("Compensation not created for Employee with Id: " + id);
+        }
+
         Employee employee = employeeRepository.findByEmployeeId(id);
         compensation.setEmployee(employee);
 

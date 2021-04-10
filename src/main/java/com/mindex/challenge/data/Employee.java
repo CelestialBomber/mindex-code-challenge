@@ -60,4 +60,28 @@ public class Employee {
     public void setDirectReports(List<Employee> directReports) {
         this.directReports = directReports;
     }
+
+    /**
+     * Ahhh, testing when different objects are retrieved... what a joy.
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj instanceof Employee)
+        {
+            Employee employee = (Employee) obj;
+            boolean idCheck = this.employeeId.equals(employee.getEmployeeId());
+            boolean firstNameCheck = this.firstName.equals(employee.getFirstName());
+            boolean lastNameCheck = this.lastName.equals(employee.getLastName());
+            boolean departmentCheck = this.department.equals(employee.getDepartment());
+            boolean positionCheck = this.position.equals(employee.getPosition());
+            // Too much of a hassle to ALSO check this, considering what it relies on
+            // boolean reportCheck = this.directReports.equals(employee.getDirectReports());
+            return idCheck && firstNameCheck && lastNameCheck && departmentCheck && positionCheck;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }
