@@ -41,6 +41,6 @@ public class ChallengeApplicationTests {
 		Compensation compensation = compensationController.read("16a596ae-edd3-4847-99fe-c4518e82c86f");
 		assert(employeeController.read("16a596ae-edd3-4847-99fe-c4518e82c86f").equals(compensation.getEmployee()));
 		assertEquals(83000, compensation.getSalary());
-		assertEquals("Apr 22 2021", compensation.getEffectiveDate());
+		assertEquals(1619064000000L, compensation.getEffectiveDate());
 	}
 }
