@@ -1,17 +1,14 @@
 package com.mindex.challenge.data;
 
-import com.mindex.challenge.dao.EmployeeRepository;
 
 import java.util.Map;
 
 public class ReportingStructure {
-    private EmployeeRepository employeeRepository;
     private Employee employee;
     private int numberOfReports;
 
-    public ReportingStructure(EmployeeRepository er, Employee e)
+    public ReportingStructure(Employee e)
     {
-        employeeRepository = er;
         employee = e;
         numberOfReports = getReportCount(0, e);
     }
@@ -43,7 +40,7 @@ public class ReportingStructure {
         for (Employee e : employee.getDirectReports())
         {
             String id = e.getEmployeeId();
-            numberOfReports += getReportCount(numberOfReports, employeeRepository.findByEmployeeId(id));
+            numberOfReports += getReportCount(numberOfReports, e);
         }
         return numberOfReports;
     }
@@ -72,7 +69,7 @@ public class ReportingStructure {
         {
             String id = e.getEmployeeId();
             if (!dupeCheck.containsKey(id)){
-                numberOfReports += getReportCount(numberOfReports, employeeRepository.findByEmployeeId(id));
+                numberOfReports += getReportCount(numberOfReports, e);
                 dupeCheck.put(id, 1);
             }
             else {

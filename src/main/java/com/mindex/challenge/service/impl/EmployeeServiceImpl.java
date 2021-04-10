@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -53,11 +55,34 @@ public class EmployeeServiceImpl implements EmployeeService {
         LOG.debug("Retrieving report of id [{}]", id);
 
         Employee employee = employeeRepository.findByEmployeeId(id);
-
         if (employee == null) {
             throw new RuntimeException("Invalid employeeId: " + id);
         }
 
-        return new ReportingStructure(this.employeeRepository, employee);
+        List<Employee> directReports = directReportUpdate(employee.getDirectReports());
+        employee.setDirectReports(directReports);
+
+
+        return new ReportingStructure(employee);
+    }
+
+    /**
+     * Helper function to recursively update direct reports at time of viewing.
+     * @param directReports - Direct report to look into and obtain information for.
+     * @return - Detailed direct report for viewing.
+     */
+    private List<Employee> directReportUpdate(List<Employee> directReports)
+    {
+        if (directReports != null)
+        {
+            for (int reportIdx = 0; reportIdx < directReports.size(); reportIdx++)
+            {
+                Employee employeeInReport = directReports.get(reportIdx);
+                employeeInReport = employeeRepository.findByEmployeeId(employeeInReport.getEmployeeId());
+                employeeInReport.setDirectReports(directReportUpdate(employeeInReport.getDirectReports()));
+                directReports.set(reportIdx, employeeInReport);
+            }
+        }
+        return directReports;
     }
 }
