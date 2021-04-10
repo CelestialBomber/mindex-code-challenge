@@ -40,6 +40,9 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new RuntimeException("Invalid employeeId: " + id);
         }
 
+        List<Employee> directReports = directReportUpdate(employee.getDirectReports());
+        employee.setDirectReports(directReports);
+
         return employee;
     }
 

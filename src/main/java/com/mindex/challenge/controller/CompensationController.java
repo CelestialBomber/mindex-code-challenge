@@ -16,10 +16,10 @@ public class CompensationController {
     private CompensationService compensationService;
 
     @PostMapping("/compensation")
-    public Compensation create(@RequestBody Employee employee) {
-        LOG.debug("Received compensation create request for [{}]", employee);
+    public Compensation create(@RequestBody Compensation compensation) {
+        LOG.debug("Received compensation create request.");
 
-        return compensationService.create(employee);
+        return compensationService.create(compensation);
     }
 
     @GetMapping("/compensation/{id}")
@@ -29,4 +29,12 @@ public class CompensationController {
         return compensationService.read(id);
     }
 
+    @PutMapping("/compensation/{id}")
+    public Compensation update(@PathVariable String id, @RequestBody Compensation compensation) {
+        LOG.debug("Received compensation create request for id [{}] and compensation [{}]", id, compensation);
+
+        compensation.setEmployeeId(id);
+
+        return compensationService.update(compensation);
+    }
 }

@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import java.util.List;
 
 @Service
 public class CompensationServiceImpl implements CompensationService {
@@ -24,22 +24,24 @@ public class CompensationServiceImpl implements CompensationService {
     private EmployeeRepository employeeRepository;
 
     /**
-     * You need an Employee in order to create a Compensation, there's no making up a random UUID for this one.
-     * SIDE-EFFECT : Compensation is added to the repository.
-     * @param employee - Employee to create a base Compensation out of.
-     * @return Newly created Compensation.
+     * Validates a compensation and inserts it into the database.
+     * @param compensation - Base compensation information.
+     * @return Same compensation - honestly, there's only a validity check on the employeeId.
      */
     @Override
-    public Compensation create(Employee employee) {
-        LOG.debug("Creating compensation [{}]", employee);
+    public Compensation create(Compensation compensation) {
+        String id = compensation.getEmployeeId();
+        Employee employee = employeeRepository.findByEmployeeId(id);
+
+        LOG.debug("Creating compensation for employee [{}]", id);
 
         if (employee == null) {
-            throw new RuntimeException("Invalid Employee.");
+            throw new RuntimeException("Invalid Employee Id.");
         }
-        String employeeId = employee.getEmployeeId();
-        Compensation compensation = new Compensation();
-        compensation.setEmployeeId(employeeId);
-        compensation.setEmployee(employeeRepository.findByEmployeeId(employeeId));
+
+        // We'll retrieve this when reading, no need to store it if the user decides to put it in.
+        compensation.setEmployee(null);
+
         compensationRepository.insert(compensation);
 
         return compensation;
@@ -61,6 +63,10 @@ public class CompensationServiceImpl implements CompensationService {
         }
 
         Employee employee = employeeRepository.findByEmployeeId(id);
+        List<Employee> directReports= employee.getDirectReports();
+        directReports = directReportUpdate(directReports);
+        employee.setDirectReports(directReports);
+
         compensation.setEmployee(employee);
 
         if (employee == null) {
@@ -68,5 +74,39 @@ public class CompensationServiceImpl implements CompensationService {
         }
 
         return compensation;
+    }
+
+    /**
+     * I know this isn't required, but I feel like I should be thorough with what's given. If an employee's ID is
+     * updated, their Compensation should too, right? Though I need to ask about Compensations, because I just
+     * realized that I'm not sure if an employee can have multiple of them...
+     */
+    @Override
+    public Compensation update(Compensation compensation) {
+        LOG.debug("Updating employee id for compensation.");
+
+        return compensationRepository.save(compensation);
+    }
+
+    /**
+     * I know duplicate code is a sin... but I want to be thorough with information reading, and I don't see
+     * the need to make this a public function or available to the rest of the package, unless there are more
+     * types added that can read Employee.
+     * @param directReports - Direct report to look into and obtain information for.
+     * @return - Detailed direct report for viewing.
+     */
+    private List<Employee> directReportUpdate(List<Employee> directReports)
+    {
+        if (directReports != null)
+        {
+            for (int reportIdx = 0; reportIdx < directReports.size(); reportIdx++)
+            {
+                Employee employeeInReport = directReports.get(reportIdx);
+                employeeInReport = employeeRepository.findByEmployeeId(employeeInReport.getEmployeeId());
+                employeeInReport.setDirectReports(directReportUpdate(employeeInReport.getDirectReports()));
+                directReports.set(reportIdx, employeeInReport);
+            }
+        }
+        return directReports;
     }
 }
