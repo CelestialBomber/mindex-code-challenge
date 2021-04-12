@@ -1,7 +1,12 @@
 [
   {
     "employeeId" : "16a596ae-edd3-4847-99fe-c4518e82c86f",
-    "salary" : 83000,
+    "salary" : 93000,
     "effectiveDate" : 1619064000000
+  },
+  {
+    "employeeId" : "16a596ae-edd3-4847-99fe-c4518e82c86f",
+    "salary" : 76000,
+    "effectiveDate" : 1427428800000
   }
 ]

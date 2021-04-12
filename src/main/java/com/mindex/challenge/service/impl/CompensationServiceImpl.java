@@ -50,30 +50,32 @@ public class CompensationServiceImpl implements CompensationService {
     /**
      * It's a GET endpoint - Compensation must already exist.
      * @param id - EmployeeId to find a compensation.
-     * @return - Found compensation with updated Employee data.
+     * @return - Found compensations with updated Employee data.
      */
     @Override
-    public Compensation read(String id) {
+    public List<Compensation> read(String id) {
         LOG.debug("Getting compensation with id [{}]", id);
 
-        Compensation compensation = compensationRepository.findByEmployeeId(id);
+        List<Compensation> compensations = compensationRepository.findByEmployeeId(id);
 
-        if (compensation == null) {
-            throw new RuntimeException("Compensation not created for Employee with Id: " + id);
+        for (Compensation compensation : compensations) {
+            if (compensation == null) {
+                throw new RuntimeException("Compensation not created for Employee with Id: " + id);
+            }
+
+            Employee employee = employeeRepository.findByEmployeeId(id);
+            if (employee == null) {
+                throw new RuntimeException("Invalid EmployeeId: " + id);
+            }
+
+            List<Employee> directReports = employee.getDirectReports();
+            directReports = directReportUpdate(directReports);
+            employee.setDirectReports(directReports);
+
+            compensation.setEmployee(employee);
         }
 
-        Employee employee = employeeRepository.findByEmployeeId(id);
-        List<Employee> directReports= employee.getDirectReports();
-        directReports = directReportUpdate(directReports);
-        employee.setDirectReports(directReports);
-
-        compensation.setEmployee(employee);
-
-        if (employee == null) {
-            throw new RuntimeException("Invalid EmployeeId: " + id);
-        }
-
-        return compensation;
+        return compensations;
     }
 
     /**

@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class CompensationController {
     private static final Logger LOG = LoggerFactory.getLogger(CompensationController.class);
@@ -23,7 +25,7 @@ public class CompensationController {
     }
 
     @GetMapping("/compensation/{id}")
-    public Compensation read(@PathVariable String id) {
+    public List<Compensation> read(@PathVariable String id) {
         LOG.debug("Received compensation create request for id [{}]", id);
 
         return compensationService.read(id);

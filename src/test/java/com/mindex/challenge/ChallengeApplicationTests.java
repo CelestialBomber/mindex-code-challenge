@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
@@ -38,9 +40,11 @@ public class ChallengeApplicationTests {
 
 	@Test
 	public void compensation_test() {
-		Compensation compensation = compensationController.read("16a596ae-edd3-4847-99fe-c4518e82c86f");
+		List<Compensation> compensations = compensationController.read("16a596ae-edd3-4847-99fe-c4518e82c86f");
+		Compensation compensation = compensations.get(0);
 		assert(employeeController.read("16a596ae-edd3-4847-99fe-c4518e82c86f").equals(compensation.getEmployee()));
-		assertEquals(83000, compensation.getSalary());
+		assertEquals(93000, compensation.getSalary());
 		assertEquals(1619064000000L, compensation.getEffectiveDate());
+		assert(compensations.size() > 1);
 	}
 }
